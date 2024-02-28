@@ -168,9 +168,9 @@ async def close_chat_with_junior(message: Message, session: AsyncSession, state:
         is_chat_id = '-1001248647604'
 
 
-        link_chat = await message.bot.export_chat_invite_link(chat_id)
-        await message.answer(text=f'{finaly_is_from_chat_with_user(june_username)}\n{link_chat}')
-        await message.answer(text=f'{finaly_is_from_chat_is(june_username)}\n{link_chat}')
+        # link_chat = await message.bot.export_chat_invite_link(chat_id)
+        await message.bot.send_message(chat_id=chat_id,text=f'{finaly_is_from_chat_with_user(june_username)}')
+        await message.bot.send_message(chat_id=is_chat_id ,text=f'{finaly_is_from_chat_is(june_username)}')
         close_active_chat = await finaly_stage_service(session, chat_id)
         await add_column_service(message, session, 'finaly_stage', 'true')
 

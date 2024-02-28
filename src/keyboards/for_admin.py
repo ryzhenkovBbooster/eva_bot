@@ -123,6 +123,7 @@ def finaly_message_from_junior_key():
     kb.button(text='приглашения')
     kb.button(text='выдача ИПО сотруднику')
     kb.button(text='close')
+    kb.button(text='главное меню')
 
 
 
