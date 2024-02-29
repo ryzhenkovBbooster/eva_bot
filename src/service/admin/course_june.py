@@ -346,6 +346,7 @@ async def schedule_job(bot: Bot, session_pool: async_sessionmaker):
                 select(Chat, CourseJune, Auth)
                 .join(CourseJune, Chat.chat_id == CourseJune.chat)
                 .join(Auth, CourseJune.manager == Auth.user_id)
+                .where(CourseJune.date_init == curr_date)
             )
             result: ScalarResult
             data = result.all()
@@ -363,15 +364,15 @@ async def schedule_job(bot: Bot, session_pool: async_sessionmaker):
 
                     }
 
-                    if june_data['date_init'] == curr_date:
-                        obj = {
-                            'chat_id': int(chat_data['chat_id']),
-                            'date_init': june_data['date_init'],
-                            'username': chat_data['username']
+
+                    obj = {
+                        'chat_id': int(chat_data['chat_id']),
+                        'date_init': june_data['date_init'],
+                        'username': chat_data['username']
 
 
-                        }
-                        await send_init_message(bot, obj)
+                    }
+                    await send_init_message(bot, obj)
 
 
 

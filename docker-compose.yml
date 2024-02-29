@@ -3,6 +3,8 @@ services:
   bot:
     build: .
     command: sh -c "python -m bot"
+    environment:
+      - TZ=Europe/Moscow
 
     env_file:
       - .env
