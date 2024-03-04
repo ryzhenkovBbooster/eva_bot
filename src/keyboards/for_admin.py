@@ -23,7 +23,7 @@ def users_key():
     return kb.as_markup(resize_keyboard=True)
 
 def get_all_from_chat_key(items: list[dict]):
-    rows = [[InlineKeyboardButton(text=item, callback_data=item)] for item in items]
+    rows = [[InlineKeyboardButton(text=item['chatname'], callback_data=str(item['chatid']))] for item in items]
 
     # Добавляем кнопку 'Отмена' в отдельный ряд
     rows.append([InlineKeyboardButton(text='Отмена', callback_data='back_to_menu')])

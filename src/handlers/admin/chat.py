@@ -281,8 +281,10 @@ async def post_start_message_from_chat(callback: CallbackQuery, state: FSMContex
         if attach_user:
 
                 if data['form_date'] is None:
+                        date_init = str(datetime.date.today()).split('-')
+                        date_init = date_init[2] + '-' + date_init[1] + '-' + date_init[0]
                         await callback.bot.send_message(chat_id=chat_id,
-                                                        text=start_message(data_message, datetime.date.today()))
+                                                        text=start_message(data_message, date_init))
                 await callback.message.answer(f'Инициализация  {data_message}, завершена.')
                 await state.clear()
 

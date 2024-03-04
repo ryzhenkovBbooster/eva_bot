@@ -45,12 +45,12 @@ async def get_active_unactiv_groups_service(session: AsyncSession, status: bool)
 
 
 
-            arr.append(chat[0].chatname)
+            arr.append({'chatname':chat[0].chatname, 'chatid':chat[0].chat_id})
 
         for chat in finaly_groups:
             chat[0]: Chat
             if chat[0].chatname in arr:
-                arr.remove(chat[0].chatname)
+                arr.remove({'chatname':chat[0].chatname, 'chatid':chat[0].chat_id})
         return arr
     else:
         result = await session.execute(select(Chat).where(Chat.active_chat == True))
@@ -58,11 +58,11 @@ async def get_active_unactiv_groups_service(session: AsyncSession, status: bool)
         groups: Chat = result.all()
         for chat in groups:
             chat: Chat
-            arr.append(chat[0].chatname)
+            arr.append({'chatname':chat[0].chatname, 'chatid':chat[0].chat_id})
         return arr
 ## получаем один, конкретный чат
 async def get_one_chat_service(session: AsyncSession, chat):
-    result = await session.execute(select(Chat).where(Chat.chatname == chat))
+    result = await session.execute(select(Chat).where(Chat.chat_id == int(chat)))
     result: ScalarResult
     chat: Chat = result.one_or_none()
     if chat is not None:
@@ -201,7 +201,7 @@ async def get_finaly_chats_service(session: AsyncSession):
     groups: Chat = result.all()
 
     for chat in groups:
-        arr.append(chat[0].chatname)
+        arr.append({'chatname':chat[0].chatname, 'chatid': chat[0].chat_id})
 
 
     return arr
