@@ -22,7 +22,7 @@ def post_test_api(email):
         'part': tests
     }
 
-    getUsers = f'https://hrscanner.ru/api/create_participant'
+    getUsers = f'https://hrscanner.com/api/create_participant'
 
     responce = requests.post(getUsers, data=data)
 

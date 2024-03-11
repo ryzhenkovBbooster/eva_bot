@@ -55,6 +55,8 @@ async def get_init_data(message: Message, session: AsyncSession):
                 'manager_username': auth_data['username'],
                 'rang': june_data['rang'],
                 'username': chat_data['username'],
+                'date': str(june_data['date_init']),
+                'chatname': chat_data['chatname']
 
             }))
             data_redis = await redis.get(name=str(message.chat.id))

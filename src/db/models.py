@@ -64,6 +64,7 @@ class CourseJune(Base):
     evaluation_table = Column(Text, unique=False, nullable=False)
     finaly_course = Column(Text, unique=False, nullable=False)
     date_init = Column(Date, unique=False, nullable=False)
+    ready_to_begin = Column(Text, unique=False, nullable=False)
 
 
 

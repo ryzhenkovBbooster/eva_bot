@@ -1,13 +1,15 @@
 import datetime
 import json
 
-from aiogram import F, Router
+from aiogram import F, Router, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.FSM.work_with_chats import Chat_work, Delete_access_services
 from src.db.database import sessionmaker
+from src.db.models import Chat, CourseJune
 from src.filters.guard import UserAccessFilter
 from src.keyboards.for_admin import get_all_from_chat_key, get_active_or_unactive_chats, crud_premission, get_chat_key, \
         cancel_key, restart_add_course_june_key
@@ -18,7 +20,7 @@ from src.service.admin.chats import get_groups_service, get_active_unactiv_group
 
 from src.service.admin.course_june import attach_user_from_chat_service, create_email_service, \
         create_practical_task_service, check_manager_in_bot, create_personnel_folder_service, check_start_service_in_kn, \
-        attach_user_from_course, get_email_june_service
+        attach_user_from_course, get_email_june_service, create_june
 from src.service.admin.init_course import get_init_data
 from src.service.admin.takeback_accesses_from_june import get_accesses_service, remove_access_service
 
@@ -277,14 +279,20 @@ async def post_start_message_from_chat(callback: CallbackQuery, state: FSMContex
                 data['form_date'] = None
         else:
                 data['form_date'] = formatted_date
+
         attach_user = await attach_user_from_course(session=session, data=data)
         if attach_user:
 
                 if data['form_date'] is None:
                         date_init = str(datetime.date.today()).split('-')
                         date_init = date_init[2] + '-' + date_init[1] + '-' + date_init[0]
-                        await callback.bot.send_message(chat_id=chat_id,
-                                                        text=start_message(data_message, date_init))
+                else:
+                        date_init = str(formatted_date).split('-')
+                        date_init = date_init[2] + '-' + date_init[1] + '-' + date_init[0]
+
+                await callback.bot.send_message(chat_id=chat_id,
+                                                text=start_message(data_message, date_init))
+
                 await callback.message.answer(f'Инициализация  {data_message}, завершена.')
                 await state.clear()
 
@@ -312,51 +320,38 @@ async def post_start_message_from_chat(callback: CallbackQuery, state: FSMContex
 
 
 @router.message(F.text.lower() == 'готов')
-async def create_june(message: Message, state: FSMContext, session: AsyncSession):
+async def ready_to_begin(message: Message, session: AsyncSession):
         data = await get_init_data(message, session)
-        if data is not None and data['email'] is None:
-
+        print(data)
+        if data is not None and data['email'] is None and data['username'] == message.from_user.username:
                 user_id = message.from_user.id
-                if message.from_user.username == data['username']:
-                        # attach_user = True
-                        attach_user = await attach_user_from_chat_service(session, data,user_id)
-                        if attach_user is True:
-                                fullname = message.chat.title
-                                folder = fullname
-                                fullname = {
-                                        'givenName': fullname.split()[2],
-                                        'familyName': fullname.split()[1]
-                                }
+                await session.execute(
+                        update(Chat).where(Chat.chat_id == data['chat_id']).values(user_chat_id=user_id))
+                await session.execute(update(CourseJune).where(message.chat.id == data['chat_id']).values(ready_to_begin='True'))
+                await session.commit()
+                if data['date'] is not None:
+                        formatted_date = data['date'].split('-')
+                        formatted_date = datetime.date(year=int(formatted_date[0]), month=int(formatted_date[1]),
+                                                       day=int(formatted_date[2]))
+                        data['date'] = formatted_date
 
-                                await message.bot.send_message(
-                                        data['curator'],
-                                        text=f"Пользователь {data['username']} закреплен за этой группой",
-                                        reply_markup=crud_premission())
-
-                                await message.answer(info_message(message.from_user.username))
-                                await create_practical_task_service(data, message, folder)
-                                await create_personnel_folder_service(data, message, fullname)
-                                await create_email_service(data, message, name=fullname)
-
-                                await check_start_service_in_kn(message, data, session)
+                if data['date'] is None:
+                        await create_june(message.bot, session, data)
+                if data['date'] < datetime.datetime.now().date():
 
 
-
-
-
-
-
-                                await redis.delete(str(message.chat.id))
-                                # await redis.set()
-                                await state.clear()
-
-                        else:
-                                await message.answer(text='это можно сделать только 1 раз')
+                        await create_june(message.bot, session, data)
                 else:
-                        await message.answer(text=f'@{message.from_user.username} ты не можешь стать тем, кем не являешся')
+                        formatted_date = str(data['date']).split('-')
+                        formatted_date = formatted_date[2] + '-' + formatted_date[1] + '-' + formatted_date[0]
+                        await message.answer(f'Отлично, {formatted_date} в 09:00 я пришлю данные для входа в почту, хорошего дня')
+
 
         else:
+                await redis.delete(str(message.chat.id))
                 await message.answer(text=f"@{message.from_user.username} Если вы проходите курс новичка и получаете это сообщение, то напишите куратору")
+
+
 
 
 

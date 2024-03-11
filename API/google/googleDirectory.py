@@ -31,7 +31,8 @@ def generate_password(length=12):
     password = ''.join(secrets.choice(alphabet) for i in range(length))
     return password
 
-def create_user_API(name: dict):
+def create_user_API(name: dict, data):
+    group = data['rang'].split('.')[0]
     # name = {
     #     'first': 'Кольцов',
     #     'last': 'Иван'
@@ -67,6 +68,11 @@ def create_user_API(name: dict):
         print(result)
         add_group = add_to_group_google(primaryEmail, group_email['МК Все сотрудники(приглашение и рассылка)'])
         if add_group is not False:
+            find_group = find_department_index(group)
+            if data['rang'].split('.')[1] == 'dep6':
+                find_group = group['МК Отдел 6']
+
+            add_to_group_google(primaryEmail, group_key=find_group)
 
             return (primaryEmail, passsword, fullname)
         else:
@@ -101,21 +107,15 @@ def rename_account_google_api(email, position):
     user_info = {
         'primaryEmail': new_email
     }
+
     try:
         result = service.users().update(userKey=email, body=user_info).execute()
 
-        find_group = find_department_index(group)
-        if dep == 'dep6':
-            find_group = group['МК Отдел 6']
 
-        print(find_group)
-        if find_group is not False :
-            add_group = add_to_group_google(new_email, group_key=find_group)
-            if add_group is not False:
 
-                return result['primaryEmail']
-            else: return False
-        else: return False
+
+        return result['primaryEmail']
+
 
 
     except Exception as e:
