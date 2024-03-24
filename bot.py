@@ -21,7 +21,6 @@ load_dotenv()
 ###!bG2$B5DipTV3%bd
 
 bot = Bot(token=os.getenv("TOKEN"))
-
 dp = Dispatcher(storage=RedisStorage(redis=redis))
 
 async def on_startup():

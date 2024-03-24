@@ -37,4 +37,14 @@ async def left_chat(session: AsyncSession, chat_id: int):
 
 
 
+async def update_to_supergroup(session: AsyncSession, old_chat_id: int, new_chat_id: int):
+    try:
 
+        result = await session.execute(update(Chat).where(Chat.chat_id == old_chat_id).values(chat_id=new_chat_id))
+        await session.commit()
+        if result != 0:
+
+            return True
+        return False
+    except:
+        return False

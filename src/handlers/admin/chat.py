@@ -319,7 +319,7 @@ async def post_start_message_from_chat(callback: CallbackQuery, state: FSMContex
 
 
 
-@router.message(F.text.lower() == 'готов')
+@router.message(F.text.lower() == 'принято')
 async def ready_to_begin(message: Message, session: AsyncSession):
         data = await get_init_data(message, session)
         print(data)
@@ -329,16 +329,18 @@ async def ready_to_begin(message: Message, session: AsyncSession):
                         update(Chat).where(Chat.chat_id == data['chat_id']).values(user_chat_id=user_id))
                 await session.execute(update(CourseJune).where(message.chat.id == data['chat_id']).values(ready_to_begin='True'))
                 await session.commit()
-                if data['date'] is not None:
+
+                if data['date'] == 'None':
+                        return await create_june(message.bot, session, data)
+                if data['date'] != 'None':
+
                         formatted_date = data['date'].split('-')
                         formatted_date = datetime.date(year=int(formatted_date[0]), month=int(formatted_date[1]),
                                                        day=int(formatted_date[2]))
                         data['date'] = formatted_date
 
-                if data['date'] is None:
-                        await create_june(message.bot, session, data)
-                if data['date'] < datetime.datetime.now().date():
 
+                if data['date'] <= datetime.datetime.now().date():
 
                         await create_june(message.bot, session, data)
                 else:
