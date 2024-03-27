@@ -91,7 +91,7 @@ async def create_email_service(data, bot: Bot, name: dict):
         await redis.set(name='fullname', value=create_email[2])
     else:
         await bot.send_message(data['chat_id'],text='Произошел сбой, ожидайте')
-        await bot.send_message(data['sender_id'], text='Произошла ошибка при создании почты')
+        await bot.send_message(data['curator'], text='Произошла ошибка при создании почты')
         await redis.set(name='google account', value='err')
 
 # функция создает skill up, внутри вызывается функция которая исполняет запрос в API getcourse через request запрос
@@ -106,9 +106,8 @@ async def create_skillup_service(data, message: Message, bot: Bot):
 ##функция которая создает практические задания, внутри нее исполняется функция которая копирует таблицу, создает папку, и помещает в нее копию таблицы
 async def create_practical_task_service(data, bot: Bot, fullname):
     practical_task = create_copy_file(name_copy=fullname)
-    print('practical task ',practical_task, type(practical_task))
     if practical_task:
-        await bot.send_message(data['manager'],text=create_practical_tasks(practical_task[0], practical_task[1]) )
+        await bot.send_message(data['manager'],text=create_practical_tasks(practical_task[1], practical_task[0]) )
         await bot.send_message(data['curator'], text="Файл с практическими заданиями отправлен руководителю")
         await redis.set(name='practical task', value=practical_task[0])
         await redis.set(name='ipo_folder_id', value=practical_task[2])
@@ -166,6 +165,7 @@ async def check_start_service_in_kn(bot: Bot, data, session: AsyncSession):
             create_practical_task=str(practical_task, 'utf-8'),
             personal_folder_link=str(folder_link, 'utf-8'),
             name_june=str(fullname, 'utf-8'),
+
             personal_folder_id=str(personal_folder_id, 'utf-8'),
             ipo_folder_id=str(ipo_folder_id, 'utf-8'),
             evaluation_table=str(table_fileid, 'utf-8'),
@@ -341,6 +341,7 @@ async def scheduler(bot: Bot, sessionmaker, times: str):
 
 
 async def schedule_job(bot: Bot, session_pool: async_sessionmaker):
+    new_commers = []
     async with session_pool() as session:
         async with session.begin():
             curr_date = datetime.now().date()
@@ -380,8 +381,13 @@ async def schedule_job(bot: Bot, session_pool: async_sessionmaker):
 
 
                     }
-                    await create_june(bot=bot,session=session, data=obj)
-
+                    new_commers.append(obj)
+    for obj in new_commers:
+        await asyncio.sleep(1)
+        # await create_june(bot=bot, session=session, data=obj)
+        async with session_pool() as session:
+            async with session.begin():
+                await create_june(bot=bot, session=session, data=obj)
 
 
 async def info_about_chat(session: AsyncSession, chat_id: int, user_id: int) -> dict or bool:
@@ -462,7 +468,6 @@ async def create_june(bot: Bot, session: AsyncSession, data: dict):
     fullname = data['chatname']
     curator = data['curator']
     chat_id = data['chat_id']
-    await bot.send_message(chat_id, 'lol')
     # attach_user = True
     # attach_user = await attach_user_from_chat_service(session, data,user_id)
     # if attach_user is True:
@@ -471,21 +476,25 @@ async def create_june(bot: Bot, session: AsyncSession, data: dict):
         'givenName': fullname.split()[2],
         'familyName': fullname.split()[1]
     }
+    try:
 
-    await bot.send_message(
-        curator,
-        text=f"Пользователь {username} закреплен за этой группой",
-        reply_markup=crud_premission())
+        await bot.send_message(
+            curator,
+            text=f"Пользователь {username} закреплен за этой группой",
+            reply_markup=crud_premission())
 
-    await bot.send_message(data['chat_id'],text=info_message(username))
-    await create_practical_task_service(data, bot, folder)
-    await create_personnel_folder_service(data, bot, fullname)
-    await create_email_service(data, bot, name=fullname)
+        await bot.send_message(data['chat_id'],text=info_message(username))
+        await create_practical_task_service(data, bot, folder)
+        await create_personnel_folder_service(data, bot, fullname)
+        await create_email_service(data, bot, name=fullname)
 
-    await check_start_service_in_kn(bot, data, session)
-
-    await redis.delete(str(data['chat_id']))
-    # await redis.set()
+        await check_start_service_in_kn(bot, data, session)
+        #
+        await redis.delete(str(data['chat_id']))
+        await redis.set()
+        return True
+    except:
+        return False
 
 
 
