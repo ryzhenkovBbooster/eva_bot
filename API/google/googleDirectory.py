@@ -49,7 +49,6 @@ def create_user_API(name: dict, data):
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
 
     service = build('admin', 'directory_v1', credentials=creds)
-    print(primaryEmail)
     passsword = generate_password(12)
     try:
         result = service.users().insert(
@@ -66,17 +65,15 @@ def create_user_API(name: dict, data):
 
         ).execute()
         print(result)
-        add_group = add_to_group_google(primaryEmail, group_email['МК Все сотрудники(приглашение и рассылка)'])
-        if add_group is not False:
-            find_group = find_department_index(group)
-            if data['rang'].split('.')[1] == 'dep6':
-                find_group = group['МК Отдел 6']
 
-            add_to_group_google(primaryEmail, group_key=find_group)
+        find_group = find_department_index(group)
+        if data['rang'].split('.')[1] == 'dep6':
+            find_group =  ['МК Отдел 6']
 
-            return (primaryEmail, passsword, fullname)
-        else:
-            return False
+        add_to_group_google(primaryEmail, group_key=find_group)
+
+        return (primaryEmail, passsword, fullname)
+
     except:
 
         return False
@@ -87,7 +84,7 @@ def rename_account_google_api(email, position):
     dep = position.split('.')[1]
     group = position.split('.')[0]
     index_user = None
-    print(dep)
+
     if 'dm' not in dep:
         index_user = search_emails_in_workspace(dep)
         print(index_user)
@@ -110,6 +107,7 @@ def rename_account_google_api(email, position):
 
     try:
         result = service.users().update(userKey=email, body=user_info).execute()
+        add_to_group_google(new_email, group_email['МК Все сотрудники(приглашение и рассылка)'])
 
 
 
@@ -133,8 +131,12 @@ def search_emails_in_workspace(filter):
         for user in users:
             user = user['primaryEmail']
             user: str
-            user = user.replace(f'{filter}.', '').replace('@bbooster.io', '')
-            a.append(int(user))
+            if f'{filter}.' in user:
+
+                user = user.replace(f'{filter}.', '').replace('@bbooster.io', '')
+
+                a.append(int(user))
+            continue
         if len(a) == 0:
             return 1
         largest_num = max(a)
