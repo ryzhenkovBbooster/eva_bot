@@ -11,7 +11,8 @@ from src.keyboards.for_admin import message_from_create_photo_key, finaly_messag
 from src.service.admin.chats import check_user_in_chat
 from src.service.admin.course_june import finaly_stage_service, add_column_service, info_about_chat
 from src.static.course_june.text import completed_skillup, send_info_about_photo, send_table_from_manager, drop_ipo, \
-    invate_to_meeting_is, invate_to_learn_users, finaly_is_from_chat_with_user, finaly_is_from_chat_is
+    invate_to_meeting_is, invate_to_learn_users, finaly_is_from_chat_with_user, finaly_is_from_chat_is, \
+    send_feedback_form
 from src.structure.misc import redis
 
 router = Router()
@@ -66,6 +67,7 @@ async def tasks_in_skillup_is_compeleted(message: Message, session: AsyncSession
 
         await message.bot.set_chat_title(chat_id=chat_id, title=chatname)
         await message.bot.send_message(chat_id=chat_id, text=completed_skillup(june_username, manager_username))
+        await message.bot.send_message(chat_id=chat_id, text=send_feedback_form(), parse_mode='Markdown')
         # await message.bot.send_message(chat_id=chat_id, text=f"Теперь ты на испытательном сроке, вступи в этот [чат]({link_from_is_chat})", parse_mode='Markdown')
         await message.bot.send_message(chat_id=manager, text=send_table_from_manager(june_username, link=table), parse_mode='Markdown')
         await message.answer('Метод выполнен')
