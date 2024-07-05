@@ -10,15 +10,15 @@ import re
 
 group_email = {
     'МК Все сотрудники(приглашение и рассылка)':'inv.mc@bbooster.online',
-    'МК Департамент 1': 'div1.mc@bbooster.online',
-    'МК Департамент 2': 'div2.mc@bbooster.online',
-    'МК Департамент 3': 'div3.mc@bbooster.online',
-    'МК Департамент 4': 'div4.mc@bbooster.online',
-    'МК Департамент 5': 'div5.mc@bbooster.online',
-    'МК Отдел 6': 'dep6.mc@bbooster.online',
-    'МК Департамент 6a': 'div6a.mc@bbooster.online',
-    'МК Департамент 6b': 'div6b.mc@bbooster.online',
-    'МК Департамент 7': 'div7.mc@bbooster.online'
+    'МК Департамент 1': 'div1.mc@bbooster.io',
+    'МК Департамент 2': 'div2.mc@bbooster.io',
+    'МК Департамент 3': 'div3.mc@bbooster.io',
+    'МК Департамент 4': 'div4.mc@bbooster.io',
+    'МК Департамент 5': 'div5.mc@bbooster.io',
+    'МК Отдел 6': 'dep6.mc@bbooster.io',
+    'МК Департамент 6a': 'div6a.mc@bbooster.io',
+    'МК Департамент 6b': 'div6b.mc@bbooster.io',
+    'МК Департамент 7': 'div7.mc@bbooster.io'
 
 }
 SCOPES = ['https://www.googleapis.com/auth/admin.directory.user', 'https://www.googleapis.com/auth/admin.directory.group']
@@ -68,7 +68,7 @@ def create_user_API(name: dict, data):
 
         find_group = find_department_index(group)
         if data['rang'].split('.')[1] == 'dep6':
-            find_group =  ['МК Отдел 6']
+            find_group = group_email['МК Отдел 6']
 
         add_to_group_google(primaryEmail, group_key=find_group)
 
