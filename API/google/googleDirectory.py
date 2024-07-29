@@ -33,10 +33,7 @@ def generate_password(length=12):
 
 def create_user_API(name: dict, data):
     group = data['rang'].split('.')[0]
-    # name = {
-    #     'first': 'Кольцов',
-    #     'last': 'Иван'
-    # }
+
 
     true_name = {key: generate_email(value) for key, value in name.items()}
     true_name['givenName'] = true_name['givenName'].title()
@@ -106,6 +103,7 @@ def rename_account_google_api(email, position):
     }
 
     try:
+        print(user_info)
         result = service.users().update(userKey=email, body=user_info).execute()
         add_to_group_google(new_email, group_email['МК Все сотрудники(приглашение и рассылка)'])
 
@@ -117,8 +115,8 @@ def rename_account_google_api(email, position):
 
 
     except Exception as e:
+        print(e)
         return False
-
 def search_emails_in_workspace(filter):
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
 
@@ -140,7 +138,7 @@ def search_emails_in_workspace(filter):
         if len(a) == 0:
             return 1
         largest_num = max(a)
-        print(largest_num, 'kek')
+        # print(largest_num, 'kek')
         return largest_num + 1
 
             # print(user['primaryEmail'])
