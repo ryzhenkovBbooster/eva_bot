@@ -93,6 +93,7 @@ async def create_email_service(data, bot: Bot, name: dict):
         await bot.send_message(data['chat_id'],text='Произошел сбой, ожидайте')
         await bot.send_message(data['curator'], text='Произошла ошибка при создании почты')
         await redis.set(name='google account', value='err')
+        await redis.set(name='fullname', value=f'err')
 
 # функция создает skill up, внутри вызывается функция которая исполняет запрос в API getcourse через request запрос
 async def create_skillup_service(data, message: Message, bot: Bot):
