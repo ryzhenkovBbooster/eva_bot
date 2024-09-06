@@ -45,7 +45,7 @@ async def back_to_admin_menu(callback: CallbackQuery, state: FSMContext):
 @router.message(F.text.lower() == "chats", UserAccessFilter(session_pool=sessionmaker), PrivateChat())
 async def get_all_chats(message: Message, session: AsyncSession, state: FSMContext):
         chats = await get_groups_service(session)
-        await message.answer(text=f'Все группы в которых когда либо был бот \n{chats}', reply_markup=get_active_or_unactive_chats(chats=chats))
+        await message.answer(text=f'Все группы в которых когда либо был бот', reply_markup=get_active_or_unactive_chats(chats=chats))
         link = 'https://docs.google.com/document/d/1gH96uhBF2e6f2LUMHZCR8nk6KIobBWfjjbxIiGRT_h0/edit'
 
         await state.set_state(Chat_work.get_chats)

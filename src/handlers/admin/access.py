@@ -37,7 +37,7 @@ async def answer_users_bot(message: Message, session: AsyncSession):
                 users_str = users_str.replace('True', 'admin').replace('False', 'client')
 
 
-        await message.answer(users_str, reply_markup=users_key())
+        await message.answer('все пользователи', reply_markup=users_key())
 
 
 
