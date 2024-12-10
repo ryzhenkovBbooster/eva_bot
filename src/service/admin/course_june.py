@@ -122,7 +122,7 @@ async def create_practical_task_service(data, bot: Bot, fullname):
 ## функция которая создает папку с личным делом сотрудника на диске в 7 департаменте
 async def create_personnel_folder_service(data, bot: Bot, fullname):
     parent_folder = os.getenv('PERSONNEL_FILES')
-    fullname = fullname['familyName'] + ' ' + fullname['givenName']
+    fullname = fullname['givenName']  + ' ' + fullname['familyName']
     folder = create_fodler(parent_folder, fullname)
     if folder:
         await bot.send_message(data['curator'], text=f'Папка с личным делом создана\n{folder[0]}')

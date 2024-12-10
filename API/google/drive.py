@@ -46,7 +46,7 @@ def create_fodler(parent_folder, name_folder):
 
 #функция копирует файл, в определенную папку, нужно два параметра имя копии файла, и id файла
 def create_copy_file(name_copy: str):
-    username = name_copy.split()[2] + ' ' + name_copy.split()[1]
+    username = name_copy.split()[1] + ' ' + name_copy.split()[2]
     file_id = os.getenv('practical_task')## id файла, копию которого нужно сделать
     table_file_id = os.getenv('EVALUATION_TABLE')
 

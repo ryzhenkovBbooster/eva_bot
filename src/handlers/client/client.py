@@ -227,7 +227,7 @@ async def create_folder_gdrive(message: Message, session: AsyncSession):
         title = message.chat.title
         rang = data['rang']
         div = rang.split('.')[0]
-        name = f'{title.split()[1]} {title.split()[2]} BBMC'
+        name = f'{title.split()[2]} {title.split()[1]} BBMC'
         folder = create_fodler(obj[div]['folder'], name_folder=name)
         if folder:
 
