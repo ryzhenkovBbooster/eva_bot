@@ -49,7 +49,7 @@ async def handle_pagination(callback: CallbackQuery, session: AsyncSession, stat
         return
 
     total_pages = (len(chats) + len(chats) // 10 - 1) // (len(chats) // 10)
-    keyboard = get_all_from_chat_key(chats, page, total_pages, chat_type)
+    keyboard = get_all_from_chat_key(chats,chat_type, page, total_pages)
     await callback.message.edit_reply_markup(reply_markup=keyboard)
 
 

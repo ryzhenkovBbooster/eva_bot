@@ -62,6 +62,10 @@ async def get_active_unactiv_groups_service(session: AsyncSession, status: bool)
         return arr
 ## получаем один, конкретный чат
 async def get_one_chat_service(session: AsyncSession, chat):
+    chat = json.loads(chat)
+
+    if type(chat) == dict:
+        chat = chat['chat_id']
     result = await session.execute(select(Chat).where(Chat.chat_id == int(chat)))
     result: ScalarResult
     chat: Chat = result.one_or_none()
