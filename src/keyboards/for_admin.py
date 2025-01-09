@@ -22,27 +22,30 @@ def users_key():
 
     return kb.as_markup(resize_keyboard=True)
 
-def get_all_from_chat_key(items: list[dict]):
-    page = 1
-    total_items = len(items)
-    page_size = max(1, total_items // 10)  # Автоматический расчет количества элементов на странице
-    total_pages = (len(items) + page_size - 1) // page_size  # Рассчитываем количество страниц
-    page = max(1, min(page, total_pages))  # Ограничиваем номер страницы в допустимых пределах
-
-    # Получаем элементы для текущей страницы
+def get_all_from_chat_key(items: list[dict], chat_type: str, page: int, total_pages: int):
+    page_size = max(1, len(items) // total_pages)  # Определяем элементы на страницу
     start_idx = (page - 1) * page_size
     end_idx = start_idx + page_size
     page_items = items[start_idx:end_idx]
 
-    rows = [[InlineKeyboardButton(text=item['chatname'], callback_data=str(item['chatid']))] for item in page_items]
+    rows = [[InlineKeyboardButton(text=item['chatname'],
+                                  callback_data=json.dumps({"type": chat_type, "chat_id": item['chatid']}))] for item in
+            page_items]
+
     nav_buttons = []
     if page > 1:
-        nav_buttons.append(InlineKeyboardButton(text='⏪ Пред.', callback_data=f'page_{page - 1}'))
+        nav_buttons.append(
+            InlineKeyboardButton(text='⏪ Пред.', callback_data=json.dumps({"type": chat_type, "page": page - 1})))
     if page < total_pages:
-        nav_buttons.append(InlineKeyboardButton(text='След. ⏩', callback_data=f'page_{page + 1}'))
+        nav_buttons.append(
+            InlineKeyboardButton(text='След. ⏩', callback_data=json.dumps({"type": chat_type, "page": page + 1})))
 
     if nav_buttons:
         rows.append(nav_buttons)
+
+    rows.append([InlineKeyboardButton(text='Отмена', callback_data='back_to_menu')])
+
+    return InlineKeyboardMarkup(inline_keyboard=rows)
 
     # Добавляем кнопку 'Отмена' в отдельный ряд
     rows.append([InlineKeyboardButton(text='Отмена', callback_data='back_to_menu')])

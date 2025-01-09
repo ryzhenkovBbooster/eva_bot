@@ -31,6 +31,28 @@ from src.service.admin.chats import get_active_unactiv_groups_service
 router = Router()
 
 ### функция отмены действия
+
+@router.callback_query(F.data.func(lambda data: json.loads(data).get("page")))
+async def handle_pagination(callback: CallbackQuery, session: AsyncSession, state: FSMContext):
+    data = json.loads(callback.data)
+    page = data["page"]
+    chat_type = data["type"]
+
+    if chat_type == "active":
+        chats = await get_active_unactiv_groups_service(session, True)
+    elif chat_type == "unactive":
+        chats = await get_active_unactiv_groups_service(session, False)
+    elif chat_type == "finaly":
+        chats = await get_finaly_chats_service(session)
+    else:
+        await callback.message.answer("Неизвестный тип чатов.")
+        return
+
+    total_pages = (len(chats) + len(chats) // 10 - 1) // (len(chats) // 10)
+    keyboard = get_all_from_chat_key(chats, page, total_pages, chat_type)
+    await callback.message.edit_reply_markup(reply_markup=keyboard)
+
+
 @router.callback_query(Chat_work.get_chats, F.data =='back_to_menu')
 @router.callback_query(Chat_work.get_chats_active_or_unactive, F.data == 'back_to_menu')
 @router.callback_query(Chat_work.get_chat, F.data =='back_to_menu')
@@ -56,7 +78,8 @@ async def get_all_chats(message: Message, session: AsyncSession, state: FSMConte
 @router.callback_query(Chat_work.get_chats, F.data.func(lambda data: json.loads(data)['data'] ) == True)
 async def get_active_chats(callback: CallbackQuery, session: AsyncSession, state: FSMContext):
         chats = await get_active_unactiv_groups_service(session, True)
-        await callback.message.answer(text='активные чаты', reply_markup=get_all_from_chat_key(chats))
+        total_pages = (len(chats) + 9) // 10
+        await callback.message.answer(text='активные чаты', reply_markup=get_all_from_chat_key(chats, 'active', 1, total_pages))
         await state.set_state(Chat_work.get_active_chat)
 
 
@@ -64,14 +87,16 @@ async def get_active_chats(callback: CallbackQuery, session: AsyncSession, state
 @router.callback_query(Chat_work.get_chats, F.data.func(lambda data: json.loads(data)['data'] ) == False)
 async def get_unactive_chats(callback: CallbackQuery, session: AsyncSession, state: FSMContext):
         chats = await get_active_unactiv_groups_service(session, False)
-        await callback.message.answer(text='не активные чаты', reply_markup=get_all_from_chat_key(chats))
+        total_pages = (len(chats) + 9) // 10
+        await callback.message.answer(text='не активные чаты', reply_markup=get_all_from_chat_key(chats, 'unactive', 1, total_pages))
         await state.set_state(Chat_work.get_chat)
 
 
 @router.callback_query(Chat_work.get_chats, F.data == 'finaly')
 async def get_finaly_chats(callback: CallbackQuery, session: AsyncSession, state: FSMContext):
         chats = await get_finaly_chats_service(session)
-        await callback.message.answer(text='завершенные чаты', reply_markup=get_all_from_chat_key(chats))
+        total_pages = (len(chats) + 9) // 10
+        await callback.message.answer(text='завершенные чаты', reply_markup=get_all_from_chat_key(chats, 'finaly', 1, total_pages))
         await state.set_state(Chat_work.finaly_chats)
 
 
