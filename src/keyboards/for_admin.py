@@ -34,7 +34,7 @@ def get_all_from_chat_key(items: list[dict]):
     end_idx = start_idx + page_size
     page_items = items[start_idx:end_idx]
 
-    rows = [[InlineKeyboardButton(text=item['chatname'], callback_data=str(item['chatid']))] for item in items]
+    rows = [[InlineKeyboardButton(text=item['chatname'], callback_data=str(item['chatid']))] for item in page_items]
     nav_buttons = []
     if page > 1:
         nav_buttons.append(InlineKeyboardButton(text='⏪ Пред.', callback_data=f'page_{page - 1}'))
