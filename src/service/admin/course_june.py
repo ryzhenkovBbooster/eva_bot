@@ -474,8 +474,8 @@ async def create_june(bot: Bot, session: AsyncSession, data: dict):
     # if attach_user is True:
     folder = fullname
     fullname = {
-        'givenName': fullname.split()[2],
-        'familyName': fullname.split()[1]
+        'givenName': fullname.split()[1],
+        'familyName': fullname.split()[2]
     }
     try:
 
