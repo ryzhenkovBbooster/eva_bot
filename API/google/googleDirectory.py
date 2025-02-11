@@ -45,7 +45,7 @@ def create_user_API(name: dict, data):
     # print(true_name, primaryEmail)
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
 
-    service = build('admin', 'directory_v1', credentials=creds)
+    service = build('admin', 'directory_v1', credentials=creds, cache_discovery=False)
     passsword = generate_password(12)
     try:
         result = service.users().insert(
@@ -97,7 +97,7 @@ def rename_account_google_api(email, position):
     # print(new_email, group)
 
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
-    service = build('admin', 'directory_v1', credentials=creds)
+    service = build('admin', 'directory_v1', credentials=creds, cache_discovery=False)
     user_info = {
         'primaryEmail': new_email
     }
@@ -120,7 +120,7 @@ def rename_account_google_api(email, position):
 def search_emails_in_workspace(filter):
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
 
-    service = build('admin', 'directory_v1', credentials=creds)
+    service = build('admin', 'directory_v1', credentials=creds, cache_discovery=False)
     a = []
     try:
         results = service.users().list(domain='bbooster.io', query=f'email:{filter}*').execute()
@@ -153,7 +153,7 @@ def search_emails_in_workspace(filter):
 
 def add_to_group_google(email, group_key):
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
-    service = build('admin', 'directory_v1', credentials=creds)
+    service = build('admin', 'directory_v1', credentials=creds, cache_discovery=False)
 
 
     member_info = {
@@ -190,7 +190,7 @@ def find_department_index(department_string):
 # add_to_group_google('dep2.1@bbooster.online', 'div2.mc@bbooster.online')
 def remove_user_by_email(user_key: str):
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
-    service = build('admin', 'directory_v1', credentials=creds)
+    service = build('admin', 'directory_v1', credentials=creds, cache_discovery=False)
     try:
         service.users().delete(userKey=user_key).execute()
         return True

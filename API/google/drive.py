@@ -23,7 +23,7 @@ def create_fodler(parent_folder, name_folder):
 
     # parent_folder = os.getenv('PERSONNEL_FILES')
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
-    service = build('drive', 'v3', credentials=creds)
+    service = build('drive', 'v3', credentials=creds, cache_discovery=False)
 
     if '.dep' in name_folder or '.dm' in name_folder:
         rudiment = name_folder.split(' ')[-1]
@@ -67,7 +67,7 @@ def create_copy_file(name_copy: str):
     current_directory = os.path.dirname(curr_file)
 
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
-    service = build('drive', 'v3', credentials=creds)
+    service = build('drive', 'v3', credentials=creds, cache_discovery=False)
     ## создание копии
     copied_file = service.files().copy(
         fileId=file_id, body=file_metadata, supportsAllDrives=True, fields='id, webViewLink'
@@ -86,7 +86,7 @@ def create_copy_file(name_copy: str):
 
 def remove_folder_by_id_in_dep(folder_id: str, rang: str):
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
-    service = build('drive', 'v3', credentials=creds)
+    service = build('drive', 'v3', credentials=creds, cache_discovery=False)
     rang = rang.split('.')[0]
     new_parent_id = obj[rang]['archiv']
     old_parent_id = obj[rang]['folder']
@@ -106,7 +106,7 @@ def remove_folder_by_id_in_dep(folder_id: str, rang: str):
 
 def remove_folder_by_id_in_personal(folder_id: str):
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
-    service = build('drive', 'v3', credentials=creds)
+    service = build('drive', 'v3', credentials=creds, cache_discovery=False)
     new_parent_id = '1jVQhWUpaAXXMVeFsqPdn9h4kOljfvLqV'
     old_parent_id = '1kwSG0TeqKltQPnU0pjT_yw4zNyzvKOFE'
     try:
@@ -125,7 +125,7 @@ def remove_folder_by_id_in_personal(folder_id: str):
 
 def remove_folder_by_id_in_IPO(ipo_folder_id: str):
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
-    service = build('drive', 'v3', credentials=creds)
+    service = build('drive', 'v3', credentials=creds, cache_discovery=False)
     new_parent_id = '1nx5R3UThPzWUUB872un26aVZY_nMyEGl'
     old_parent_id = '1JuJAehyvJu0UQwOUrXU6uRV0x-hlSRgi'
     try:
@@ -144,7 +144,7 @@ def remove_folder_by_id_in_IPO(ipo_folder_id: str):
 
 def update_permission(file_id):
     creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
-    service = build('drive', 'v3', credentials=creds)
+    service = build('drive', 'v3', credentials=creds, cache_discovery=False)
     permission = {
         'type': 'domain',
         'role': 'writer',
