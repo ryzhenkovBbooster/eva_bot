@@ -71,8 +71,8 @@ def create_user_API(name: dict, data):
 
         return (primaryEmail, passsword, fullname)
 
-    except:
-
+    except Exception as e:
+        print(f'ERROR create_user_API : {e}')
         return False
 
 
