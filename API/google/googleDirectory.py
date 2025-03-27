@@ -6,7 +6,7 @@ from API.google.dict_ru_eng import generate_email
 import secrets
 import string
 import re
-
+import logging
 
 group_email = {
     'МК Все сотрудники(приглашение и рассылка)':'inv.mc@bbooster.online',
@@ -33,8 +33,6 @@ def generate_password(length=12):
 
 def create_user_API(name: dict, data):
     group = data['rang'].split('.')[0]
-
-
     true_name = {key: generate_email(value) for key, value in name.items()}
     true_name['givenName'] = true_name['givenName'].title()
     true_name['familyName'] = true_name['familyName'].title()
@@ -43,11 +41,10 @@ def create_user_API(name: dict, data):
     primaryEmail = true_name['givenName'][0] + '.' + true_name['familyName'] + '@bbooster.io'
     primaryEmail = primaryEmail.lower()
     # print(true_name, primaryEmail)
-    creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
-
-    service = build('admin', 'directory_v1', credentials=creds, cache_discovery=False)
-    passsword = generate_password(12)
     try:
+        creds = Credentials.from_authorized_user_file(current_directory + '/token.json', SCOPES)
+        service = build('admin', 'directory_v1', credentials=creds, cache_discovery=False)
+        passsword = generate_password(12)
         result = service.users().insert(
             body={
             "primaryEmail":primaryEmail,
@@ -62,7 +59,7 @@ def create_user_API(name: dict, data):
 
         ).execute()
         print(result)
-
+        logging.info(result)
         find_group = find_department_index(group)
         if data['rang'].split('.')[1] == 'dep6':
             find_group = group_email['МК Отдел 6']
@@ -72,7 +69,8 @@ def create_user_API(name: dict, data):
         return (primaryEmail, passsword, fullname)
 
     except Exception as e:
-        print(f'ERROR create_user_API : {e}')
+        print(f'ERROR create_user_API : {e}')  
+        logging.exception(e)
         return False
 
 
