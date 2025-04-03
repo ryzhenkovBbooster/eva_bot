@@ -5,8 +5,9 @@ services:
     command: sh -c "python -m bot"
     environment:
       - TZ=Europe/Moscow
-
-    env_file:
-      - .env
+    volumes:
+      - ./.env:/app/.env
+    # env_file:
+    #   - .env
     restart: always
 
